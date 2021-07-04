@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import com.example.demo.model.ToDoEntity;
 import com.example.demo.repository.ToDoRepository;
@@ -36,11 +37,11 @@ class ToDoControllerWithServiceIT {
 
 	@Test
 	void whenGetAll_thenReturnValidResponse() throws Exception {
-		String testText = "My to do text";
+		var testText = "My to do text";
 		when(toDoRepository.findAll()).thenReturn(
-			Arrays.asList(
-				new ToDoEntity(1l, testText)
-			)
+				Collections.singletonList(
+						new ToDoEntity(1L, testText)
+				)
 		);
 		
 		this.mockMvc
