@@ -15,7 +15,7 @@ import com.example.demo.repository.ToDoRepository;
 @Service
 public class ToDoService {
 	
-	private ToDoRepository toDoRepository;
+	private final ToDoRepository toDoRepository;
 
 	public ToDoService(ToDoRepository toDoRepository) {
 		this.toDoRepository = toDoRepository;
@@ -23,7 +23,7 @@ public class ToDoService {
 	
 	public List<ToDoResponse> getAll() {
 		return toDoRepository.findAll().stream()
-			.map(i -> ToDoEntityToResponseMapper.map(i))
+			.map(ToDoEntityToResponseMapper::map)
 			.collect(Collectors.toList()); 
 	}
 
