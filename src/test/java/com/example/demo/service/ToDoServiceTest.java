@@ -5,11 +5,9 @@ import com.example.demo.dto.mapper.ToDoEntityToResponseMapper;
 import com.example.demo.exception.ToDoNotFoundException;
 import com.example.demo.model.ToDoEntity;
 import com.example.demo.repository.ToDoRepository;
-import com.example.demo.repository.specification.ToDoSpecifications;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -84,6 +82,33 @@ class ToDoServiceTest {
         for (int i = 0; i < todos.size(); i++) {
             assertThat(todos.get(i), samePropertyValuesAs(
                     ToDoEntityToResponseMapper.map(completedTodos.get(i))
+            ));
+        }
+    }
+
+    @Test
+    void whenGetAllInProgress_thenReturnAllWhereCompletedAtNull() {
+        //mock
+        var testToDos = new ArrayList<ToDoEntity>();
+        testToDos.add(new ToDoEntity(0L, "Test 1", ZonedDateTime.now(ZoneOffset.UTC)));
+        var toDo1 = new ToDoEntity(1L, "Test 2");
+        var toDo2 = new ToDoEntity(2L, "Test 3");
+        var inProgressTodos = List.of(toDo1, toDo2);
+        testToDos = new ArrayList<>(inProgressTodos);
+        when(toDoRepository.findAll(where(any())))
+                .thenReturn(testToDos
+                        .stream()
+                        .filter(todo -> todo.getCompletedAt() == null)
+                        .collect(Collectors.toList()));
+
+        //call
+        var todos = toDoService.getAllInProgress();
+
+        //validate
+        assertEquals(todos.size(), inProgressTodos.size());
+        for (int i = 0; i < todos.size(); i++) {
+            assertThat(todos.get(i), samePropertyValuesAs(
+                    ToDoEntityToResponseMapper.map(inProgressTodos.get(i))
             ));
         }
     }
