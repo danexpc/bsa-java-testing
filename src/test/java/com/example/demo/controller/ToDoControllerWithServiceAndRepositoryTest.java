@@ -91,6 +91,15 @@ class ToDoControllerWithServiceAndRepositoryTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].text").value(testTextForInProgress))
                 .andExpect(jsonPath("$[0].id").isNumber())
-                .andExpect(jsonPath("$[0].completedAt").exists());
+                .andExpect(jsonPath("$[0].completedAt").doesNotExist());
+    }
+
+    @Test
+    void whenIdDoesntExist_thenReturnNotFoundStatus() throws Exception {
+        long id = 1L;
+
+        this.mockMvc
+                .perform(get("/todos/" + id))
+                .andExpect(status().isNotFound());
     }
 }
