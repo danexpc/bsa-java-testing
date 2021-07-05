@@ -19,8 +19,7 @@ import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(classes = DemoApplicationTestConfig.class)
@@ -116,11 +115,29 @@ class ToDoControllerWithServiceAndRepositoryTest {
     @Test
     void whenIdDoesntExist_thenReturnNotFoundStatus() throws Exception {
         long id = 1L;
-        String testText = "My to do text";
 
         this.mockMvc
                 .perform(get("/todos/" + id))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void whenCompleteToDo_thenSetCompleteAt() throws Exception {
+        long id = 1L;
+        String testText = "My to do text";
+
+        ToDoEntity todo = new ToDoEntity(id, testText);
+
+        toDoRepository.save(todo);
+
+        this.mockMvc
+                .perform(put("/todos/" + id + "/complete"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.text").value(testText))
+                .andExpect(jsonPath("$.completedAt").exists());
+
+        assertThat(toDoRepository.findById(id).orElseThrow().getCompletedAt()).isNotNull();
     }
 
     @Test
