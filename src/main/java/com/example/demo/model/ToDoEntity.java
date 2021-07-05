@@ -31,6 +31,10 @@ public class ToDoEntity {
 	public ToDoEntity(String text) {
 		this.text = text;
 	}
+
+	public ToDoEntity(Long id) {
+		this.id = id;
+	}
 	
 	public ToDoEntity(Long id, String text) {
 		this.id = id;
@@ -47,7 +51,7 @@ public class ToDoEntity {
 	public String toString() {
 		return String.format(
 			"ToDoEntity[id=%d, text='%s', completedAt='%s']",
-			id, text, completedAt.toString()
+			id, text, completedAt == null ? null : completedAt.toString()
 		);
 	}
 
