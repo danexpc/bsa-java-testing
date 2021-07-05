@@ -43,6 +43,12 @@ public class ToDoController {
 		return toDoService.completeToDo(id);
 	}
 
+	@PutMapping("/todos/{id}/cancel")
+	@Valid
+	public ToDoResponse cancel(@PathVariable Long id) throws ToDoNotFoundException {
+		return toDoService.cancelToDo(id);
+	}
+
 	@GetMapping("/todos/{id}")
 	@Valid
 	public ToDoResponse getOne(@PathVariable Long id) throws ToDoNotFoundException {

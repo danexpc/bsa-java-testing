@@ -45,6 +45,12 @@ public class ToDoService {
 		return ToDoEntityToResponseMapper.map(toDoRepository.save(todo));
 	}
 
+	public ToDoResponse cancelToDo(Long id) throws ToDoNotFoundException {
+		ToDoEntity todo = toDoRepository.findById(id).orElseThrow(() -> new ToDoNotFoundException(id));
+		todo.cancelNow();
+		return ToDoEntityToResponseMapper.map(toDoRepository.save(todo));
+	}
+
 	public ToDoResponse getOne(Long id) throws ToDoNotFoundException {
 		return  ToDoEntityToResponseMapper.map(
 			toDoRepository.findById(id).orElseThrow(() -> new ToDoNotFoundException(id))
