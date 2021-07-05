@@ -97,12 +97,29 @@ class ToDoControllerWithServiceAndRepositoryTest {
     }
 
     @Test
+    void whenIdExist_thenReturnToDoWithItsId() throws Exception {
+        long id = 1L;
+        String testText = "My to do text";
+
+        ToDoEntity todo = new ToDoEntity(id, testText);
+
+        toDoRepository.save(todo);
+
+        this.mockMvc
+                .perform(get("/todos/" + id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.text").value(testText))
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.completedAt").doesNotExist());
+    }
+
+    @Test
     void whenIdDoesntExist_thenReturnNotFoundStatus() throws Exception {
         long id = 1L;
         String testText = "My to do text";
 
         this.mockMvc
-                .perform(get("/todos" + id))
+                .perform(get("/todos/" + id))
                 .andExpect(status().isNotFound());
     }
 
