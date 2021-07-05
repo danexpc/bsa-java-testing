@@ -176,4 +176,13 @@ class ToDoServiceTest {
         assertThrows(ToDoNotFoundException.class, () -> toDoService.getOne(1L));
     }
 
+    @Test
+    void whenDeleteAll_thenRepositoryDeleteAllCalled() {
+        //call
+        toDoService.deleteAll();
+
+        //validate
+        verify(toDoRepository, times(1)).deleteAll();
+    }
+
 }
