@@ -63,6 +63,7 @@ class ToDoControllerWithServiceAndRepositoryTest {
         String testTextForCompleted = "My to do text for completed";
         String testTextForInProgress = "My to do text for in progress";
         ZonedDateTime completeTime = ZonedDateTime.now(ZoneOffset.UTC);
+
         toDoRepository.save(new ToDoEntity(1L, testTextForCompleted, completeTime));
         toDoRepository.save(new ToDoEntity(2L, testTextForInProgress));
 
@@ -82,6 +83,7 @@ class ToDoControllerWithServiceAndRepositoryTest {
         String testTextForCompleted = "My to do text for completed";
         String testTextForInProgress = "My to do text for in progress";
         ZonedDateTime completeTime = ZonedDateTime.now(ZoneOffset.UTC);
+
         toDoRepository.save(new ToDoEntity(1L, testTextForCompleted, completeTime));
         toDoRepository.save(new ToDoEntity(2L, testTextForInProgress));
 
@@ -100,7 +102,6 @@ class ToDoControllerWithServiceAndRepositoryTest {
     void whenIdExist_thenReturnToDoWithItsId() throws Exception {
         long id = 1L;
         String testText = "My to do text";
-
         ToDoEntity todo = new ToDoEntity(id, testText);
 
         toDoRepository.save(todo);
@@ -126,7 +127,6 @@ class ToDoControllerWithServiceAndRepositoryTest {
     void whenCompleteToDo_thenSetCompleteAt() throws Exception {
         long id = 1L;
         String testText = "My to do text";
-
         ToDoEntity todo = new ToDoEntity(id, testText);
 
         toDoRepository.save(todo);
@@ -145,7 +145,6 @@ class ToDoControllerWithServiceAndRepositoryTest {
     void whenCancelToDo_thenSetCompleteAtAsNull() throws Exception {
         long id = 1L;
         String testText = "My to do text";
-
         ToDoEntity todo = new ToDoEntity(id, testText, ZonedDateTime.now(ZoneOffset.UTC));
 
         toDoRepository.save(todo);
@@ -164,7 +163,6 @@ class ToDoControllerWithServiceAndRepositoryTest {
     void whenSaveToDo_thenFindToDoByItsId() throws Exception {
         long id = 1L;
         String testText = "My to do text for saving request";
-
         ToDoEntity todo = new ToDoEntity(id, testText);
 
         this.mockMvc
@@ -184,7 +182,6 @@ class ToDoControllerWithServiceAndRepositoryTest {
     void whenDeleteToDoById_thenFindToDoByItsIdReturnsEmptyOptional() throws Exception {
         long id = 1L;
         String testText = "My to do text for saving request";
-
         ToDoEntity todo = new ToDoEntity(id, testText);
 
         toDoRepository.save(todo);
