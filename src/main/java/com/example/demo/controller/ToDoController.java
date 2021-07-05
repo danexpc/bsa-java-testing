@@ -15,60 +15,60 @@ import java.util.List;
 @RestController
 public class ToDoController {
 
-	@Autowired
-	ToDoService toDoService;
-	
-	@ExceptionHandler({ ToDoNotFoundException.class })
-	public ResponseEntity<Object> handleException(Exception ex) {
-		return ResponseEntity.notFound().build();
-	}
-	
-	@GetMapping("/todos")
-	@Valid
-	public List<ToDoResponse> getAll(@RequestParam(required = false) Boolean isCompleted) {
-		if (isCompleted != null) {
-			if (isCompleted) {
-				return toDoService.getAllCompleted();
-			}
-			return toDoService.getAllInProgress();
-		}
-		return toDoService.getAll();
-	}
+    @Autowired
+    ToDoService toDoService;
 
-	@PostMapping("/todos")
-	@Valid
-	public ToDoResponse save(@Valid @RequestBody ToDoSaveRequest todoSaveRequest) throws ToDoNotFoundException {
-		return toDoService.upsert(todoSaveRequest);
-	}
+    @ExceptionHandler({ToDoNotFoundException.class})
+    public ResponseEntity<Object> handleException(Exception ex) {
+        return ResponseEntity.notFound().build();
+    }
 
-	@PutMapping("/todos/{id}/complete")
-	@Valid
-	public ToDoResponse save(@PathVariable Long id) throws ToDoNotFoundException {
-		return toDoService.completeToDo(id);
-	}
+    @GetMapping("/todos")
+    @Valid
+    public List<ToDoResponse> getAll(@RequestParam(required = false) Boolean isCompleted) {
+        if (isCompleted != null) {
+            if (isCompleted) {
+                return toDoService.getAllCompleted();
+            }
+            return toDoService.getAllInProgress();
+        }
+        return toDoService.getAll();
+    }
 
-	@PutMapping("/todos/{id}/cancel")
-	@Valid
-	public ToDoResponse cancel(@PathVariable Long id) throws ToDoNotFoundException {
-		return toDoService.cancelToDo(id);
-	}
+    @PostMapping("/todos")
+    @Valid
+    public ToDoResponse save(@Valid @RequestBody ToDoSaveRequest todoSaveRequest) throws ToDoNotFoundException {
+        return toDoService.upsert(todoSaveRequest);
+    }
 
-	@GetMapping("/todos/{id}")
-	@Valid
-	public ToDoResponse getOne(@PathVariable Long id) throws ToDoNotFoundException {
-		return toDoService.getOne(id);
-	}
+    @PutMapping("/todos/{id}/complete")
+    @Valid
+    public ToDoResponse save(@PathVariable Long id) throws ToDoNotFoundException {
+        return toDoService.completeToDo(id);
+    }
 
-	@DeleteMapping("/todos/{id}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void delete(@PathVariable Long id) {
-		toDoService.deleteOne(id);
-	}
+    @PutMapping("/todos/{id}/cancel")
+    @Valid
+    public ToDoResponse cancel(@PathVariable Long id) throws ToDoNotFoundException {
+        return toDoService.cancelToDo(id);
+    }
 
-	@DeleteMapping("/todos")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void deleteAll() {
-		toDoService.deleteAll();
-	}
+    @GetMapping("/todos/{id}")
+    @Valid
+    public ToDoResponse getOne(@PathVariable Long id) throws ToDoNotFoundException {
+        return toDoService.getOne(id);
+    }
+
+    @DeleteMapping("/todos/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        toDoService.deleteOne(id);
+    }
+
+    @DeleteMapping("/todos")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAll() {
+        toDoService.deleteAll();
+    }
 
 }

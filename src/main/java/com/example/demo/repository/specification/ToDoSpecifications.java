@@ -4,6 +4,9 @@ import com.example.demo.model.ToDoEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 public class ToDoSpecifications {
+    private ToDoSpecifications() {
+    }
+
     public static Specification<ToDoEntity> isCompleted() {
         return (root, query, cb) -> root.get("completedAt").isNotNull();
     }

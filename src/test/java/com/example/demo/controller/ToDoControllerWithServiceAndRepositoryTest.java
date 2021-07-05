@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -44,9 +43,14 @@ class ToDoControllerWithServiceAndRepositoryTest {
 
     @Test
     void whenGetAll_thenReturnValidResponse() throws Exception {
-        String testText = "My to do text 1";
-        toDoRepository.save(new ToDoEntity(1L, testText));
 
+        // given
+        String testText = "My to do text 1";
+        var todo = new ToDoEntity(1L, testText);
+        toDoRepository.save(todo);
+
+        // when
+        // then
         this.mockMvc
                 .perform(get("/todos"))
                 .andExpect(status().isOk())
@@ -60,6 +64,8 @@ class ToDoControllerWithServiceAndRepositoryTest {
 
     @Test
     void whenGetAllCompleted_thenReturnValidResponse() throws Exception {
+
+        // given
         String testTextForCompleted = "My to do text for completed";
         String testTextForInProgress = "My to do text for in progress";
         ZonedDateTime completeTime = ZonedDateTime.now(ZoneOffset.UTC);
@@ -67,6 +73,8 @@ class ToDoControllerWithServiceAndRepositoryTest {
         toDoRepository.save(new ToDoEntity(1L, testTextForCompleted, completeTime));
         toDoRepository.save(new ToDoEntity(2L, testTextForInProgress));
 
+        // when
+        // then
         this.mockMvc
                 .perform(get("/todos?isCompleted=true"))
                 .andExpect(status().isOk())
@@ -80,6 +88,8 @@ class ToDoControllerWithServiceAndRepositoryTest {
 
     @Test
     void whenGetAllInProgress_thenReturnValidResponse() throws Exception {
+
+        // given
         String testTextForCompleted = "My to do text for completed";
         String testTextForInProgress = "My to do text for in progress";
         ZonedDateTime completeTime = ZonedDateTime.now(ZoneOffset.UTC);
@@ -87,6 +97,9 @@ class ToDoControllerWithServiceAndRepositoryTest {
         toDoRepository.save(new ToDoEntity(1L, testTextForCompleted, completeTime));
         toDoRepository.save(new ToDoEntity(2L, testTextForInProgress));
 
+
+        // when
+        // then
         this.mockMvc
                 .perform(get("/todos?isCompleted=false"))
                 .andExpect(status().isOk())
@@ -100,12 +113,16 @@ class ToDoControllerWithServiceAndRepositoryTest {
 
     @Test
     void whenIdExist_thenReturnToDoWithItsId() throws Exception {
+
+        // given
         long id = 1L;
         String testText = "My to do text";
         ToDoEntity todo = new ToDoEntity(id, testText);
 
         toDoRepository.save(todo);
 
+        // when
+        // then
         this.mockMvc
                 .perform(get("/todos/" + id))
                 .andExpect(status().isOk())
@@ -116,8 +133,12 @@ class ToDoControllerWithServiceAndRepositoryTest {
 
     @Test
     void whenIdDoesntExist_thenReturnNotFoundStatus() throws Exception {
+
+        // given
         long id = 1L;
 
+        // when
+        // then
         this.mockMvc
                 .perform(get("/todos/" + id))
                 .andExpect(status().isNotFound());
@@ -125,12 +146,15 @@ class ToDoControllerWithServiceAndRepositoryTest {
 
     @Test
     void whenCompleteToDo_thenSetCompleteAt() throws Exception {
+
+        // given
         long id = 1L;
         String testText = "My to do text";
         ToDoEntity todo = new ToDoEntity(id, testText);
 
         toDoRepository.save(todo);
 
+        // when
         this.mockMvc
                 .perform(put("/todos/" + id + "/complete"))
                 .andExpect(status().isOk())
@@ -138,17 +162,21 @@ class ToDoControllerWithServiceAndRepositoryTest {
                 .andExpect(jsonPath("$.text").value(testText))
                 .andExpect(jsonPath("$.completedAt").exists());
 
+        // then
         assertThat(toDoRepository.findById(id).orElseThrow().getCompletedAt()).isNotNull();
     }
 
     @Test
     void whenCancelToDo_thenSetCompleteAtAsNull() throws Exception {
+
+        // given
         long id = 1L;
         String testText = "My to do text";
         ToDoEntity todo = new ToDoEntity(id, testText, ZonedDateTime.now(ZoneOffset.UTC));
 
         toDoRepository.save(todo);
 
+        // when
         this.mockMvc
                 .perform(put("/todos/" + id + "/cancel"))
                 .andExpect(status().isOk())
@@ -156,15 +184,19 @@ class ToDoControllerWithServiceAndRepositoryTest {
                 .andExpect(jsonPath("$.text").value(testText))
                 .andExpect(jsonPath("$.completedAt").doesNotExist());
 
+        // then
         assertThat(toDoRepository.findById(id).orElseThrow().getCompletedAt()).isNull();
     }
 
     @Test
     void whenSaveToDo_thenFindToDoByItsId() throws Exception {
+
+        // given
         long id = 1L;
         String testText = "My to do text for saving request";
         ToDoEntity todo = new ToDoEntity(id, testText);
 
+        // when
         this.mockMvc
                 .perform(post("/todos")
                         .content(mapper.writeValueAsString(todo))
@@ -175,26 +207,33 @@ class ToDoControllerWithServiceAndRepositoryTest {
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.completedAt").doesNotExist());
 
+        // then
         assertThat(toDoRepository.findById(id).orElseThrow()).isEqualToComparingFieldByField(todo);
     }
 
     @Test
     void whenDeleteToDoById_thenFindToDoByItsIdReturnsEmptyOptional() throws Exception {
+
+        // given
         long id = 1L;
         String testText = "My to do text for saving request";
         ToDoEntity todo = new ToDoEntity(id, testText);
 
         toDoRepository.save(todo);
 
+        // when
         this.mockMvc
                 .perform(delete("/todos/" + id))
                 .andExpect(status().isNoContent());
 
+        // then
         assertThat(toDoRepository.findById(id)).isNotPresent();
     }
 
     @Test
     void whenDeleteAllToDo_thenFindAllToDoReturnsEmptyList() throws Exception {
+
+        // given
         String testTextForCompleted = "My to do text for completed";
         String testTextForInProgress = "My to do text for in progress";
         ZonedDateTime completeTime = ZonedDateTime.now(ZoneOffset.UTC);
@@ -202,10 +241,12 @@ class ToDoControllerWithServiceAndRepositoryTest {
         toDoRepository.save(new ToDoEntity(1L, testTextForCompleted, completeTime));
         toDoRepository.save(new ToDoEntity(2L, testTextForInProgress));
 
+        // when
         this.mockMvc
                 .perform(delete("/todos"))
                 .andExpect(status().isNoContent());
 
+        // then
         assertThat(toDoRepository.findAll().isEmpty()).isTrue();
     }
 }
