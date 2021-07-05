@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 
+import javax.xml.crypto.Data;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -144,6 +145,31 @@ class ToDoServiceTest {
         assertEquals(result.id, todo.getId());
         assertEquals(result.text, todo.getText());
         assertTrue(result.completedAt.isAfter(startTime));
+    }
+
+    @Test
+    void whenCancel_thenReturnWithEmptyCompletedAt() throws ToDoNotFoundException {
+        var startTime = ZonedDateTime.now(ZoneOffset.UTC);
+        //mock
+        var todo = new ToDoEntity(0L, "Test 1", ZonedDateTime.now(ZoneOffset.UTC));
+        when(toDoRepository.findById(anyLong())).thenReturn(Optional.of(todo));
+        when(toDoRepository.save(ArgumentMatchers.any(ToDoEntity.class))).thenAnswer(i -> {
+            ToDoEntity arg = i.getArgument(0, ToDoEntity.class);
+            Long id = arg.getId();
+            if (id.equals(todo.getId())) {
+                return todo;
+            } else {
+                return new ToDoEntity();
+            }
+        });
+
+        //call
+        var result = toDoService.cancelToDo(todo.getId());
+
+        //validate
+        assertEquals(result.id, todo.getId());
+        assertEquals(result.text, todo.getText());
+        assertNull(result.completedAt);
     }
 
     @Test
