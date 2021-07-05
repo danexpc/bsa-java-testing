@@ -141,6 +141,25 @@ class ToDoControllerWithServiceAndRepositoryTest {
     }
 
     @Test
+    void whenCancelToDo_thenSetCompleteAtAsNull() throws Exception {
+        long id = 1L;
+        String testText = "My to do text";
+
+        ToDoEntity todo = new ToDoEntity(id, testText, ZonedDateTime.now(ZoneOffset.UTC));
+
+        toDoRepository.save(todo);
+
+        this.mockMvc
+                .perform(put("/todos/" + id + "/cancel"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.text").value(testText))
+                .andExpect(jsonPath("$.completedAt").doesNotExist());
+
+        assertThat(toDoRepository.findById(id).orElseThrow().getCompletedAt()).isNull();
+    }
+
+    @Test
     void whenSaveToDo_thenFindToDoByItsId() throws Exception {
         long id = 1L;
         String testText = "My to do text for saving request";
