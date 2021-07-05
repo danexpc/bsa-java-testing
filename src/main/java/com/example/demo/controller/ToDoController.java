@@ -60,6 +60,7 @@ public class ToDoController {
 	}
 
 	@DeleteMapping("/todos/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable Long id) {
 		toDoService.deleteOne(id);
 	}
