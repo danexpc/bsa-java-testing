@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import com.example.demo.exception.ToDoNotFoundException;
 import com.example.demo.service.ToDoService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class ToDoController {
@@ -21,8 +23,8 @@ public class ToDoController {
 	ToDoService toDoService;
 	
 	@ExceptionHandler({ ToDoNotFoundException.class })
-	public String handleException(Exception ex) {
-		return ex.getMessage();
+	public ResponseEntity<Object> handleException(Exception ex) {
+		return ResponseEntity.notFound().build();
 	}
 	
 	@GetMapping("/todos")
