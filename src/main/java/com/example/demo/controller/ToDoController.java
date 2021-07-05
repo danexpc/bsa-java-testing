@@ -1,20 +1,16 @@
 package com.example.demo.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import javax.validation.Valid;
-
 import com.example.demo.dto.ToDoResponse;
 import com.example.demo.dto.ToDoSaveRequest;
 import com.example.demo.exception.ToDoNotFoundException;
 import com.example.demo.service.ToDoService;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 public class ToDoController {
