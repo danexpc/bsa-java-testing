@@ -3,7 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.config.DemoApplicationTestConfig;
 import com.example.demo.model.ToDoEntity;
 import com.example.demo.repository.ToDoRepository;
-import org.junit.jupiter.api.AfterEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +15,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Random;
-import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(classes = DemoApplicationTestConfig.class)
@@ -33,7 +33,7 @@ class ToDoControllerWithServiceAndRepositoryTest {
     @Autowired
     ToDoRepository toDoRepository;
 
-    private final Random random = new Random();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
@@ -43,7 +43,7 @@ class ToDoControllerWithServiceAndRepositoryTest {
     @Test
     void whenGetAll_thenReturnValidResponse() throws Exception {
         String testText = "My to do text 1";
-        toDoRepository.save(new ToDoEntity(random.nextLong(), testText));
+        toDoRepository.save(new ToDoEntity(1L, testText));
 
         this.mockMvc
                 .perform(get("/todos"))
@@ -61,8 +61,8 @@ class ToDoControllerWithServiceAndRepositoryTest {
         String testTextForCompleted = "My to do text for completed";
         String testTextForInProgress = "My to do text for in progress";
         ZonedDateTime completeTime = ZonedDateTime.now(ZoneOffset.UTC);
-        toDoRepository.save(new ToDoEntity(random.nextLong(), testTextForCompleted, completeTime));
-        toDoRepository.save(new ToDoEntity(random.nextLong(), testTextForInProgress));
+        toDoRepository.save(new ToDoEntity(1L, testTextForCompleted, completeTime));
+        toDoRepository.save(new ToDoEntity(2L, testTextForInProgress));
 
         this.mockMvc
                 .perform(get("/todos?isCompleted=true"))
@@ -80,8 +80,8 @@ class ToDoControllerWithServiceAndRepositoryTest {
         String testTextForCompleted = "My to do text for completed";
         String testTextForInProgress = "My to do text for in progress";
         ZonedDateTime completeTime = ZonedDateTime.now(ZoneOffset.UTC);
-        toDoRepository.save(new ToDoEntity(random.nextLong(), testTextForCompleted, completeTime));
-        toDoRepository.save(new ToDoEntity(random.nextLong(), testTextForInProgress));
+        toDoRepository.save(new ToDoEntity(1L, testTextForCompleted, completeTime));
+        toDoRepository.save(new ToDoEntity(2L, testTextForInProgress));
 
         this.mockMvc
                 .perform(get("/todos?isCompleted=false"))
@@ -97,9 +97,30 @@ class ToDoControllerWithServiceAndRepositoryTest {
     @Test
     void whenIdDoesntExist_thenReturnNotFoundStatus() throws Exception {
         long id = 1L;
+        String testText = "My to do text";
 
         this.mockMvc
-                .perform(get("/todos/" + id))
+                .perform(get("/todos" + id))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void whenSaveToDo_thenFindToDoByItsId() throws Exception {
+        long id = 1L;
+        String testText = "My to do text for saving request";
+
+        ToDoEntity todo = new ToDoEntity(id, testText);
+
+        this.mockMvc
+                .perform(post("/todos")
+                        .content(mapper.writeValueAsString(todo))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.text").value(testText))
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.completedAt").doesNotExist());
+
+        assertThat(toDoRepository.findById(id).orElseThrow()).isEqualToComparingFieldByField(todo);
     }
 }
