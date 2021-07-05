@@ -5,20 +5,24 @@ import com.example.demo.dto.mapper.ToDoEntityToResponseMapper;
 import com.example.demo.exception.ToDoNotFoundException;
 import com.example.demo.model.ToDoEntity;
 import com.example.demo.repository.ToDoRepository;
+import com.example.demo.repository.specification.ToDoSpecifications;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
+import org.springframework.data.jpa.domain.Specification;
 
-import javax.xml.crypto.Data;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.data.jpa.domain.Specification.where;
 
 class ToDoServiceTest {
 
@@ -51,6 +55,35 @@ class ToDoServiceTest {
         for (int i = 0; i < todos.size(); i++) {
             assertThat(todos.get(i), samePropertyValuesAs(
                     ToDoEntityToResponseMapper.map(testToDos.get(i))
+            ));
+        }
+    }
+
+    @Test
+    void whenGetAllCompleted_thenReturnAllWhereCompletedAtNotNull() {
+        //mock
+        var testToDos = new ArrayList<ToDoEntity>();
+        testToDos.add(new ToDoEntity(0L, "Test 1"));
+        var toDo1 = new ToDoEntity(1L, "Test 2");
+        var toDo2 = new ToDoEntity(2L, "Test 3");
+        toDo1.completeNow();
+        toDo2.completeNow();
+        var completedTodos = List.of(toDo1, toDo2);
+        testToDos = new ArrayList<>(completedTodos);
+        when(toDoRepository.findAll(where(any())))
+                .thenReturn(testToDos
+                        .stream()
+                        .filter(todo -> todo.getCompletedAt() != null)
+                        .collect(Collectors.toList()));
+
+        //call
+        var todos = toDoService.getAllCompleted();
+
+        //validate
+        assertEquals(todos.size(), completedTodos.size());
+        for (int i = 0; i < todos.size(); i++) {
+            assertThat(todos.get(i), samePropertyValuesAs(
+                    ToDoEntityToResponseMapper.map(completedTodos.get(i))
             ));
         }
     }
