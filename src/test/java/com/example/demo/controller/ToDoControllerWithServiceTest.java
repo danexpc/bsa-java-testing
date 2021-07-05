@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ToDoController.class)
 @ActiveProfiles(profiles = "test")
 @Import(ToDoService.class)
-class ToDoControllerWithServiceIT {
+class ToDoControllerWithServiceTest {
 
 	@Autowired
 	private MockMvc mockMvc;

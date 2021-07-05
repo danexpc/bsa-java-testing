@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ToDoController.class)
 @ActiveProfiles(profiles = "test")
-class ToDoControllerIT {
+class ToDoControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
