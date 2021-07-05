@@ -9,6 +9,6 @@ public class ToDoSpecifications {
     }
 
     public static Specification<ToDoEntity> isInProgress() {
-        return (root, query, cb) -> root.get("completedAt").isNull();
+        return Specification.not(isCompleted());
     }
 }
