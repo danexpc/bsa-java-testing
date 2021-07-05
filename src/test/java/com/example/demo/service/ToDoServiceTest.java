@@ -231,6 +231,11 @@ class ToDoServiceTest {
     }
 
     @Test
+    void whenCancelByIdThatDoesntExist_thenThrowToDoNotFoundException() {
+        assertThrows(ToDoNotFoundException.class, () -> toDoService.cancelToDo(1L));
+    }
+
+    @Test
     void whenGetOne_thenReturnCorrectOne() throws ToDoNotFoundException {
         //mock
         var todo = new ToDoEntity(0L, "Test 1");
