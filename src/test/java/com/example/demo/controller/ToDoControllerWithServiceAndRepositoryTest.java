@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -177,5 +178,37 @@ class ToDoControllerWithServiceAndRepositoryTest {
                 .andExpect(jsonPath("$.completedAt").doesNotExist());
 
         assertThat(toDoRepository.findById(id).orElseThrow()).isEqualToComparingFieldByField(todo);
+    }
+
+    @Test
+    void whenDeleteToDoById_thenFindToDoByItsIdReturnsEmptyOptional() throws Exception {
+        long id = 1L;
+        String testText = "My to do text for saving request";
+
+        ToDoEntity todo = new ToDoEntity(id, testText);
+
+        toDoRepository.save(todo);
+
+        this.mockMvc
+                .perform(delete("/todos/" + id))
+                .andExpect(status().isNoContent());
+
+        assertThat(toDoRepository.findById(id)).isNotPresent();
+    }
+
+    @Test
+    void whenDeleteAllToDo_thenFindAllToDoReturnsEmptyList() throws Exception {
+        String testTextForCompleted = "My to do text for completed";
+        String testTextForInProgress = "My to do text for in progress";
+        ZonedDateTime completeTime = ZonedDateTime.now(ZoneOffset.UTC);
+
+        toDoRepository.save(new ToDoEntity(1L, testTextForCompleted, completeTime));
+        toDoRepository.save(new ToDoEntity(2L, testTextForInProgress));
+
+        this.mockMvc
+                .perform(delete("/todos"))
+                .andExpect(status().isNoContent());
+
+        assertThat(toDoRepository.findAll().isEmpty()).isTrue();
     }
 }
