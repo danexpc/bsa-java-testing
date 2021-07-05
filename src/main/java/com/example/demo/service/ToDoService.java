@@ -47,13 +47,13 @@ public class ToDoService {
         return toDoRepository.findAll(specification);
     }
 
-    public ToDoResponse upsert(ToDoSaveRequest toDoDTO) throws ToDoNotFoundException {
+    public ToDoResponse upsert(ToDoSaveRequest toDoDTO) {
         ToDoEntity todo;
         //update if it has id or create if it hasn't
         if (toDoDTO.id == null) {
             todo = new ToDoEntity(toDoDTO.text);
         } else {
-            todo = toDoRepository.findById(toDoDTO.id).orElseThrow(() -> new ToDoNotFoundException(toDoDTO.id));
+            todo = toDoRepository.findById(toDoDTO.id).orElse(new ToDoEntity(toDoDTO.id));
             todo.setText(toDoDTO.text);
         }
         return ToDoEntityToResponseMapper.map(toDoRepository.save(todo));
