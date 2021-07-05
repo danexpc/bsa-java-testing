@@ -74,4 +74,23 @@ class ToDoControllerWithServiceAndRepositoryTest {
                 .andExpect(jsonPath("$[0].id").isNumber())
                 .andExpect(jsonPath("$[0].completedAt").exists());
     }
+
+    @Test
+    void whenGetAllInProgress_thenReturnValidResponse() throws Exception {
+        String testTextForCompleted = "My to do text for completed";
+        String testTextForInProgress = "My to do text for in progress";
+        ZonedDateTime completeTime = ZonedDateTime.now(ZoneOffset.UTC);
+        toDoRepository.save(new ToDoEntity(random.nextLong(), testTextForCompleted, completeTime));
+        toDoRepository.save(new ToDoEntity(random.nextLong(), testTextForInProgress));
+
+        this.mockMvc
+                .perform(get("/todos?isCompleted=false"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].text").value(testTextForInProgress))
+                .andExpect(jsonPath("$[0].id").isNumber())
+                .andExpect(jsonPath("$[0].completedAt").exists());
+    }
 }
