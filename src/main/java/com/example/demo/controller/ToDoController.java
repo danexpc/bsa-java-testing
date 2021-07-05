@@ -27,7 +27,13 @@ public class ToDoController {
 	
 	@GetMapping("/todos")
 	@Valid
-	public List<ToDoResponse> getAll() {
+	public List<ToDoResponse> getAll(@RequestParam(required = false) Boolean isCompleted) {
+		if (isCompleted != null) {
+			if (isCompleted) {
+				return toDoService.getAllCompleted();
+			}
+			return toDoService.getAllInProgress();
+		}
 		return toDoService.getAll();
 	}
 
