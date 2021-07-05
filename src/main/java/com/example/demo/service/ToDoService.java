@@ -6,6 +6,7 @@ import com.example.demo.dto.mapper.ToDoEntityToResponseMapper;
 import com.example.demo.exception.ToDoNotFoundException;
 import com.example.demo.model.ToDoEntity;
 import com.example.demo.repository.ToDoRepository;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,15 +32,19 @@ public class ToDoService {
     }
 
     public List<ToDoResponse> getAllCompleted() {
-        return toDoRepository.findAll(where(isCompleted())).stream()
+        return getAllByCriteria(where(isCompleted())).stream()
                 .map(ToDoEntityToResponseMapper::map)
                 .collect(Collectors.toList());
     }
 
     public List<ToDoResponse> getAllInProgress() {
-        return toDoRepository.findAll(where(isInProgress())).stream()
+        return getAllByCriteria(where(isInProgress())).stream()
                 .map(ToDoEntityToResponseMapper::map)
                 .collect(Collectors.toList());
+    }
+
+    private List<ToDoEntity> getAllByCriteria(Specification<ToDoEntity> specification) {
+        return toDoRepository.findAll(specification);
     }
 
     public ToDoResponse upsert(ToDoSaveRequest toDoDTO) throws ToDoNotFoundException {
